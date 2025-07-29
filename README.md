@@ -3,7 +3,7 @@
     <img src="./assets/logo.png" width="200" />
 </div>   
 <div align=center> 
-    <i>Another attempt in finding the most convient way to manage penetration testing process</i>
+    <i>Another attempt to find the most convient way to manage penetration testing process</i>
 </div>
 <br>
 A modular Bash-based CLI tool to automate logging, directory structure creation, tool execution, and note-taking during penetration testing engagements.
