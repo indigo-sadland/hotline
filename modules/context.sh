@@ -2,11 +2,20 @@
 
 set_target() {
     local TARGET="$1" SVC="$2"
-    if [[ -z "${TARGET:-}" || -z "${SVC:-}" ]]; then
-        err "Usage: $0 context <TARGET(IP/DOMAIN)> <PORT_SERVICE>"
+
+    if [[ $TARGET == "show" ]]; then
+        show_context
         exit 1
     fi
 
+    if [[ -z "${TARGET:-}" || -z "${SVC:-}" ]]; then
+        err "Usage: 
+        $0 context <TARGET(IP/DOMAIN)> <PORT_SERVICE> - to set context
+        $0 context show - to show current context
+            "
+        exit 1
+    fi
+    
     if [[ -f "$CONTEXT_FILE" ]]; then
         echo "$TARGET $SVC" > "$CONTEXT_FILE"
         info "Context set: $TARGET $SVC"
@@ -32,5 +41,18 @@ check_context() {
         MSG=$(err "No context set. Use: $0 context <TARGET(DOMAIN/IP)> <PORT_SERVICE>")
         STATUS=1
         echo "0|0|$MSG|$STATUS"
+    fi
+}
+
+show_context() {
+    if [[ -f "$CONTEXT_FILE" ]]; then
+        read -r TARGET SVC < "$CONTEXT_FILE"
+        if [[ -z "$TARGET" ]] && [[ -z "$SVC" ]]; then
+            err "No context set. Use: $0 context <TARGET(DOMAIN/IP)> <PORT_SERVICE>"
+        else
+            info "Current context: TARGET=${TARGET} SVC=${SVC}"
+        fi
+    else
+        err "No context set. Use: $0 context <TARGET(DOMAIN/IP)> <PORT_SERVICE>"
     fi
 }

@@ -44,5 +44,6 @@ sudo ln -s $(pwd)/hotline.sh /usr/local/bin/hotline
 
 ## ToDo
 - [ ] Hierarchical tree creation based on `ffuf` and `feroxbuster` results;
-- [ ] Show current context command;  
+- [x] Show current context command;  
 - [ ] Integration with `fzf`;
+- [ ] Plugin for integration with `ZAP` and `Burp Suite`
