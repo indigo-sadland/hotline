@@ -1,27 +1,49 @@
 #! /bin/bash
 
 set_target() {
-    local TARGET="$1" SVC="$2"
+    local SUB_COMMAND="$1"
+    local TARGET="$2" SVC="$3"
 
-    if [[ $TARGET == "show" ]]; then
+    if [[ $SUB_COMMAND == "show" ]]; then
         show_context
         exit 1
     fi
-
-    if [[ -z "${TARGET:-}" || -z "${SVC:-}" ]]; then
-        err "Usage: 
-        $0 context <TARGET(IP/DOMAIN)> <PORT_SERVICE> - to set context
-        $0 context show - to show current context
-            "
-        exit 1
-    fi
     
-    if [[ -f "$CONTEXT_FILE" ]]; then
-        echo "$TARGET $SVC" > "$CONTEXT_FILE"
-        info "Context set: $TARGET $SVC"
-    else
-        err "Unable to locate $0 results dir."
+    if [[ $SUB_COMMAND == "project" ]]; then
+        if [[ -z "${TARGET:-}" ]]; then
+            err "Usage: 
+            $0 context set <TARGET(IP/DOMAIN)> <PORT_SERVICE> - to set context
+            $0 context show - to show current context
+            $0 context project <STRING> - to set project name
+            "
+            exit 1
+        else
+            if grep -q "^CURRENT_PROJECT_NAME=" "$CONFIG_FILE"; then
+                # Replace line (match key only)
+                sed -i "s|^CURRENT_PROJECT_NAME=.*|CURRENT_PROJECT_NAME=\"${TARGET}\"|" "$CONFIG_FILE"
+                exit 1
+            fi
+        fi
     fi
+
+    if [[ $SUB_COMMAND == "set" ]]; then
+        if [[ -z "${TARGET:-}" || -z "${SVC:-}" ]]; then
+            err "Usage: 
+                $0 context <TARGET(IP/DOMAIN)> <PORT_SERVICE> - to set context
+                $0 context show - to show current context
+                $0 context project <STRING> - to set project name
+             "
+            exit 1
+        else 
+            if [[ -f "$CONTEXT_FILE" ]]; then
+                echo "$TARGET $SVC" > "$CONTEXT_FILE"
+                info "Context set: $TARGET $SVC"
+            else
+                err "Unable to locate $0 results dir."
+            fi
+        fi
+    fi
+
 }
 
 check_context() {
@@ -50,7 +72,8 @@ show_context() {
         if [[ -z "$TARGET" ]] && [[ -z "$SVC" ]]; then
             err "No context set. Use: $0 context <TARGET(DOMAIN/IP)> <PORT_SERVICE>"
         else
-            info "Current context: TARGET=${TARGET} SVC=${SVC}"
+            PROJECT=$(grep "^CURRENT_PROJECT_NAME=" "$CONFIG_FILE")
+            info "Current context: TARGET=${TARGET} SVC=${SVC} ${PROJECT}"
         fi
     else
         err "No context set. Use: $0 context <TARGET(DOMAIN/IP)> <PORT_SERVICE>"

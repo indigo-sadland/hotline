@@ -17,14 +17,17 @@ chmod +x hotline.sh
 sudo ln -s $(pwd)/hotline.sh /usr/local/bin/hotline
 ```
 ## Usage/Workflow
-1. Adjust your current project name in `hotline.conf`
+1. Adjust your current project name:
+    ```
+    hotline project "my_new_project"
+    ```
 2. Use `hotline initial  <target|range> <nmap-args>` to run nmap and prepare the directory tree for all discovered ports and services under `$HOME/hotline-results` directory.
     ```
     hotline initial 10.10.10.0/24 "-sV -p-"
     ```
 3. Set the active target + service context for the `run` and `note` commands using `hotline context <TARGET> <PORT_SERVICE>`.
     ```
-    hotline context 10.10.10.5 80_http
+    hotline context set 10.10.10.5 80_http
     ```
 4. Run any CLI tool (e.g., ffuf, sqlmap, feroxbuster) using `run <TOOL COMMAND>`.
     ```
@@ -46,4 +49,5 @@ sudo ln -s $(pwd)/hotline.sh /usr/local/bin/hotline
 - [ ] Hierarchical tree creation based on `ffuf` and `feroxbuster` results;
 - [x] Show current context command;  
 - [ ] Integration with `fzf`;
-- [ ] Plugin for integration with `ZAP` and `Burp Suite`
+- [ ] Plugin for integration with `ZAP` and `Burp Suite`;
+- [x] Set project name via command
