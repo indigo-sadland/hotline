@@ -36,7 +36,7 @@ set_target() {
         fi
         ;;
       *)
-        err "Unknown command: $COMMAND"
+        err "Unknown subcommand: $SUB_COMMAND"
         show_context_help
         exit 1
         ;;
