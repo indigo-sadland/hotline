@@ -35,10 +35,16 @@ Available Commands:
       Example:
           hotline.sh initial 10.10.10.0/24 "-sV -p-"
 
-  context <TARGET> <PORT_SERVICE>
+  context project <STRING>
+      Set current project name
+      Example:
+          hotline.sh project hackerone
+  context set <TARGET> <PORT_SERVICE>
       Set current working context for 'run' and 'note'.
       Example:
           hotline.sh context 10.10.10.5 80_http
+  context show
+      Show current context
 
   run "<TOOL COMMAND>"
       Run any tool (e.g. ffuf, feroxbuster, curl) under current context and log output.

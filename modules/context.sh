@@ -4,35 +4,27 @@ set_target() {
     local SUB_COMMAND="$1"
     local TARGET="$2" SVC="$3"
 
-    if [[ $SUB_COMMAND == "show" ]]; then
+    case "$SUB_COMMAND" in
+      show)
         show_context
         exit 1
-    fi
-    
-    if [[ $SUB_COMMAND == "project" ]]; then
+        ;;
+      project)
         if [[ -z "${TARGET:-}" ]]; then
-            err "Usage: 
-            $0 context set <TARGET(IP/DOMAIN)> <PORT_SERVICE> - to set context
-            $0 context show - to show current context
-            $0 context project <STRING> - to set project name
-            "
+            show_help
             exit 1
         else
             if grep -q "^CURRENT_PROJECT_NAME=" "$CONFIG_FILE"; then
                 # Replace line (match key only)
                 sed -i "s|^CURRENT_PROJECT_NAME=.*|CURRENT_PROJECT_NAME=\"${TARGET}\"|" "$CONFIG_FILE"
+                info "Project name set: $TARGET"
                 exit 1
             fi
         fi
-    fi
-
-    if [[ $SUB_COMMAND == "set" ]]; then
+        ;;
+      set)
         if [[ -z "${TARGET:-}" || -z "${SVC:-}" ]]; then
-            err "Usage: 
-                $0 context <TARGET(IP/DOMAIN)> <PORT_SERVICE> - to set context
-                $0 context show - to show current context
-                $0 context project <STRING> - to set project name
-             "
+            show_help
             exit 1
         else 
             if [[ -f "$CONTEXT_FILE" ]]; then
@@ -42,7 +34,13 @@ set_target() {
                 err "Unable to locate $0 results dir."
             fi
         fi
-    fi
+        ;;
+      *)
+        err "Unknown command: $COMMAND"
+        echo 'Check "help" command'
+        exit 1
+        ;;
+    esac
 
 }
 
@@ -78,4 +76,12 @@ show_context() {
     else
         err "No context set. Use: $0 context <TARGET(DOMAIN/IP)> <PORT_SERVICE>"
     fi
+}
+
+show_help() {
+    err "Usage: 
+        $0 context set <TARGET(IP/DOMAIN)> <PORT_SERVICE> - to set context
+        $0 context show - to show current context
+        $0 context project <STRING> - to set project name
+        "
 }
