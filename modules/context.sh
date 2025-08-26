@@ -6,12 +6,12 @@ set_target() {
 
     case "$SUB_COMMAND" in
       show)
-        show_context
+        show_context_help
         exit 1
         ;;
       project)
         if [[ -z "${TARGET:-}" ]]; then
-            show_help
+            show_context_help
             exit 1
         else
             if grep -q "^CURRENT_PROJECT_NAME=" "$CONFIG_FILE"; then
@@ -24,7 +24,7 @@ set_target() {
         ;;
       set)
         if [[ -z "${TARGET:-}" || -z "${SVC:-}" ]]; then
-            show_help
+            show_context_help
             exit 1
         else 
             if [[ -f "$CONTEXT_FILE" ]]; then
@@ -37,7 +37,7 @@ set_target() {
         ;;
       *)
         err "Unknown command: $COMMAND"
-        echo 'Check "help" command'
+        show_context_help
         exit 1
         ;;
     esac
@@ -78,7 +78,7 @@ show_context() {
     fi
 }
 
-show_help() {
+show_context_help() {
     err "Usage: 
         $0 context set <TARGET(IP/DOMAIN)> <PORT_SERVICE> - to set context
         $0 context show - to show current context
