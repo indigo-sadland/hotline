@@ -6,7 +6,7 @@ set_target() {
 
     case "$SUB_COMMAND" in
       show)
-        show_context_help
+        show_context
         exit 1
         ;;
       project)
