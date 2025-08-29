@@ -26,26 +26,31 @@ run_func() {
     check_target_dir
 
     # --- Check that command is passed ---
-    CMD="$*"
-    if [[ -z "$CMD" ]]; then
+    CMD_STRING="$*" # for logs
+    CMD=("$@")
+    if [[ $# -eq 0 ]]; then
         err "Usage: $0 run <TOOL COMMAND>. For example: python3 ./sqlmap.py -r request --random-agent"
         exit 1
     fi
 
     # --- Normalize tool name for cases when python command required. For example, python3 ./sqlmap.py ----
-    TOOL="$1"
+    TOOL="${CMD[0]}"
     if [[ $1 == "python3"  ]] || [[ $1 == "python" ]]; then
-        TOOL="$2"
+        TOOL="${CMD_ARRAY[1]}"
     fi
+    
+    TOOL=$(basename "$TOOL")
 
     local PIPE_CMD
     # --- For ffuf and feroxbuster we want to use their json output flags for future tree creation proccess ---
     case $TOOL in
      ffuf)
-        CMD+=" -o ${TARGET_SVC_DIR}/${TOOL}_${TIMESTAMP}.json"
+        OUTFILE="${TARGET_SVC_DIR}/${TOOL}_${TIMESTAMP}.json"
+        CMD+=(-o "$OUTFILE")
      ;;
      feroxbuster)
-        CMD+=" --json -o ${TARGET_SVC_DIR}/${TOOL}_${TIMESTAMP}.json"
+	OUTFILE="${TARGET_SVC_DIR}/${TOOL}_${TIMESTAMP}.json"
+        CMD+=(--json -o "$OUTFILE")
      ;;
      *)
         PIPE_CMD=" | tee "${TARGET_SVC_DIR}/${TOOL}_${TIMESTAMP}.log""
@@ -53,16 +58,16 @@ run_func() {
 
     # --- Execute the given command ---
     set +e
-        eval "$CMD" "$PIPE_CMD"
+        bash -c 'exec "$@"' _ "${CMD[@]}" "$PIPE_CMD"
         local STATUS=$?
     set -e
 
     # --- Save the command to history file
     local HIST
     if [[ $STATUS -eq 0 ]]; then
-        HIST="- Done: $CMD"
+        HIST="- Done: $CMD_STRING"
     else
-        HIST="- Err OR Interrupted: $CMD"    
+        HIST="- Err OR Interrupted: $CMD_STRING"    
     fi
     save_history "$TARGET_DIR" "$HIST"
 
