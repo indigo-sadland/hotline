@@ -19,6 +19,11 @@ CONFIG_FILE="$PROJECT_ROOT/config/hotline.conf"
 UTILS="$PROJECT_ROOT/utils/utils.sh"
 [ -f "$UTILS" ] && source "$UTILS"
 
+# --- Create output dir if not exists ---
+if [[ ! -e $RESULT_DIR ]]; then
+    mkdir "$RESULT_DIR"
+fi
+
 # --- Create state file if not exists --- 
 if [[ ! -e $CONTEXT_FILE ]]; then
     touch "$CONTEXT_FILE"
